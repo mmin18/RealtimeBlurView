@@ -1,7 +1,7 @@
-<FrameLayout android:id="@+id/root"
-			 xmlns:android="http://schemas.android.com/apk/res/android"
-			 android:layout_width="match_parent"
-			 android:layout_height="match_parent">
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
 
 	<ListView
 		android:id="@+id/list"
@@ -9,16 +9,73 @@
 		android:layout_height="match_parent"/>
 
 	<com.github.mmin18.widget.RealtimeBlurView
-		android:layout_width="match_parent"
+		android:id="@+id/blur_view"
+		android:layout_width="360dp"
 		android:layout_height="360dp"
-		android:layout_gravity="center"/>
+		android:layout_centerInParent="true"/>
 
 	<TextView
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_gravity="center"
+		android:layout_centerInParent="true"
 		android:text="TOP"
 		android:textColor="#00f"
 		android:textSize="40sp"/>
 
-</FrameLayout>
+	<!-- radius and downsampling -->
+
+	<SeekBar
+		android:id="@+id/blur_radius"
+		android:layout_width="200dp"
+		android:layout_height="wrap_content"
+		android:layout_alignBottom="@+id/blur_view"
+		android:layout_centerHorizontal="true"
+		android:layout_marginBottom="10dp"
+		android:max="50"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignTop="@+id/blur_radius"
+		android:layout_toLeftOf="@+id/blur_radius"
+		android:text="radius"
+		android:textColor="#000"
+		android:textSize="13sp"/>
+
+	<TextView
+		android:id="@+id/blur_radius_val"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignTop="@+id/blur_radius"
+		android:layout_toRightOf="@+id/blur_radius"
+		android:textColor="#000"
+		android:textSize="13sp"/>
+
+	<SeekBar
+		android:id="@+id/blur_downsampling"
+		android:layout_width="200dp"
+		android:layout_height="wrap_content"
+		android:layout_above="@+id/blur_radius"
+		android:layout_centerHorizontal="true"
+		android:layout_marginBottom="10dp"
+		android:max="15"/>
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignTop="@+id/blur_downsampling"
+		android:layout_toLeftOf="@+id/blur_downsampling"
+		android:text="sampling"
+		android:textColor="#000"
+		android:textSize="13sp"/>
+
+	<TextView
+		android:id="@+id/blur_downsampling_val"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignTop="@+id/blur_downsampling"
+		android:layout_toRightOf="@+id/blur_downsampling"
+		android:textColor="#000"
+		android:textSize="13sp"/>
+
+</RelativeLayout>

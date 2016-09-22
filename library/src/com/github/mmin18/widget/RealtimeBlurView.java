@@ -13,6 +13,7 @@ import android.support.v8.renderscript.Element;
 import android.support.v8.renderscript.RenderScript;
 import android.support.v8.renderscript.ScriptIntrinsicBlur;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -26,9 +27,9 @@ public class RealtimeBlurView extends View {
 
 	private float mDownsampleFactor; // default 4
 	private int mOverlayColor; // default #aaffffff
-	private float mBlurRadius; // default 15
+	private float mBlurRadius; // default 10dp (0 < r <= 25)
 
-	private boolean mDownsampleFactorChanged;
+	private boolean mDirty;
 	private Bitmap mBitmapToBlur, mBlurredBitmap;
 	private Canvas mBlurringCanvas;
 	private RenderScript mRenderScript;
@@ -41,67 +42,109 @@ public class RealtimeBlurView extends View {
 		super(context, attrs);
 
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RealtimeBlurView);
-		mBlurRadius = a.getInt(R.styleable.RealtimeBlurView_blurRadius, 15);
-		mDownsampleFactor = a.getInt(R.styleable.RealtimeBlurView_downsampleFactor, 4);
+		mBlurRadius = a.getDimension(R.styleable.RealtimeBlurView_blurRadius,
+				TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, context.getResources().getDisplayMetrics()));
+		mDownsampleFactor = a.getFloat(R.styleable.RealtimeBlurView_downsampleFactor, 4);
 		mOverlayColor = a.getColor(R.styleable.RealtimeBlurView_overlayColor, 0xAAFFFFFF);
 		a.recycle();
 	}
 
-	public void setBlurRadius(int radius) {
-		if (mBlurScript != null) {
-			mBlurScript.setRadius(radius);
+	public void setBlurRadius(float radius) {
+		if (mBlurRadius != radius) {
+			mBlurRadius = radius;
+			mDirty = true;
+			invalidate();
 		}
 	}
 
-	public void setDownsampleFactor(int factor) {
+	public void setDownsampleFactor(float factor) {
 		if (factor <= 0) {
 			throw new IllegalArgumentException("Downsample factor must be greater than 0.");
 		}
 
 		if (mDownsampleFactor != factor) {
 			mDownsampleFactor = factor;
-			mDownsampleFactorChanged = true;
+			mDirty = true; // may also change blur radius
+			releaseBitmap();
+			invalidate();
 		}
 	}
 
 	public void setOverlayColor(int color) {
-		mOverlayColor = color;
+		if (mOverlayColor != color) {
+			mOverlayColor = color;
+			invalidate();
+		}
+	}
+
+	private void releaseBitmap() {
+		if (mBlurInput != null) {
+			mBlurInput.destroy();
+			mBlurInput = null;
+		}
+		if (mBlurOutput != null) {
+			mBlurOutput.destroy();
+			mBlurOutput = null;
+		}
+		if (mBitmapToBlur != null) {
+			mBitmapToBlur.recycle();
+			mBitmapToBlur = null;
+		}
+		if (mBlurredBitmap != null) {
+			mBlurredBitmap.recycle();
+			mBlurredBitmap = null;
+		}
+	}
+
+	private void releaseScript() {
+		if (mRenderScript != null) {
+			mRenderScript.destroy();
+			mRenderScript = null;
+		}
+		if (mBlurScript != null) {
+			mBlurScript.destroy();
+			mBlurScript = null;
+		}
+	}
+
+	protected void release() {
+		releaseBitmap();
+		releaseScript();
 	}
 
 	protected boolean prepare() {
-		if (mRenderScript == null) {
-			mRenderScript = RenderScript.create(getContext());
-			mBlurScript = ScriptIntrinsicBlur.create(mRenderScript, Element.U8_4(mRenderScript));
-			mBlurScript.setRadius(mBlurRadius);
+		if (mBlurRadius == 0) {
+			release();
+			return false;
+		}
+
+		float downsampleFactor = mDownsampleFactor;
+
+		if (mDirty || mRenderScript == null) {
+			if (mRenderScript == null) {
+				mRenderScript = RenderScript.create(getContext());
+				mBlurScript = ScriptIntrinsicBlur.create(mRenderScript, Element.U8_4(mRenderScript));
+			}
+
+			mDirty = false;
+			float radius = mBlurRadius / downsampleFactor;
+			if (radius > 25) {
+				downsampleFactor = downsampleFactor * radius / 25;
+				radius = 25;
+			}
+			mBlurScript.setRadius(radius);
 		}
 
 		final int width = getWidth();
 		final int height = getHeight();
 
-		int scaledWidth = (int) (width / mDownsampleFactor);
-		int scaledHeight = (int) (height / mDownsampleFactor);
+		int scaledWidth = (int) (width / downsampleFactor);
+		int scaledHeight = (int) (height / downsampleFactor);
 
-		if (mBlurringCanvas == null || mDownsampleFactorChanged || mBlurredBitmap == null
+		if (mBlurringCanvas == null || mBlurredBitmap == null
 				|| mBlurredBitmap.getWidth() != scaledWidth
 				|| mBlurredBitmap.getHeight() != scaledHeight) {
-
-			if (mBlurInput != null) {
-				mBlurInput.destroy();
-				mBlurInput = null;
-			}
-			if (mBlurOutput != null) {
-				mBlurOutput = null;
-			}
-			if (mBitmapToBlur != null) {
-				mBitmapToBlur.recycle();
-				mBitmapToBlur = null;
-			}
-			if (mBlurredBitmap != null) {
-				mBlurredBitmap.recycle();
-				mBlurredBitmap = null;
-			}
-
-			mDownsampleFactorChanged = false;
+			releaseBitmap();
 
 			mBitmapToBlur = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
 			if (mBitmapToBlur == null) {
@@ -180,14 +223,7 @@ public class RealtimeBlurView extends View {
 	@Override
 	protected void onDetachedFromWindow() {
 		getViewTreeObserver().removeOnPreDrawListener(preDrawListener);
-		if (mRenderScript != null) {
-			mRenderScript.destroy();
-			mRenderScript = null;
-		}
-		if (mBlurScript != null) {
-			mBlurScript.destroy();
-			mBlurScript = null;
-		}
+		release();
 		super.onDetachedFromWindow();
 	}
 
@@ -207,9 +243,8 @@ public class RealtimeBlurView extends View {
 			mRectDst.right = getWidth();
 			mRectDst.bottom = getHeight();
 			canvas.drawBitmap(mBlurredBitmap, mRectSrc, mRectDst, null);
-
-			canvas.drawColor(mOverlayColor);
 		}
+		canvas.drawColor(mOverlayColor);
 	}
 
 	private static class StopException extends RuntimeException {
