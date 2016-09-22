@@ -15,7 +15,6 @@ import android.support.v8.renderscript.ScriptIntrinsicBlur;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 import com.github.mmin18.realtimeblurview.R;
@@ -176,18 +175,16 @@ public class RealtimeBlurView extends View {
 	private final ViewTreeObserver.OnPreDrawListener preDrawListener = new ViewTreeObserver.OnPreDrawListener() {
 		@Override
 		public boolean onPreDraw() {
+			final int[] locations = new int[2];
 			if (isShown() && prepare()) {
 				View decor = ((Activity) getContext()).getWindow().getDecorView();
+				decor.getLocationInWindow(locations);
+				int x = -locations[0];
+				int y = -locations[1];
 
-				int x = getLeft(), y = getTop();
-				View v = RealtimeBlurView.this;
-				while (v.getParent() instanceof ViewGroup) {
-					v = (View) v.getParent();
-					if (v == decor)
-						break;
-					x += v.getLeft();
-					y += v.getTop();
-				}
+				getLocationInWindow(locations);
+				x += locations[0];
+				y += locations[1];
 
 				if (decor.getBackground() instanceof ColorDrawable) {
 					mBitmapToBlur.eraseColor(((ColorDrawable) decor.getBackground()).getColor());

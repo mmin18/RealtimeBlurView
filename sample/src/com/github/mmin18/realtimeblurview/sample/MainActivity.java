@@ -3,6 +3,8 @@ package com.github.mmin18.realtimeblurview.sample;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -16,8 +18,6 @@ public class MainActivity extends Activity {
 	RealtimeBlurView blurView;
 	SeekBar blurRadius;
 	TextView blurRadiusText;
-	SeekBar blurDownsampling;
-	TextView blurDownsamplingText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,24 +46,7 @@ public class MainActivity extends Activity {
 		blurRadiusText = (TextView) findViewById(R.id.blur_radius_val);
 		updateRadius();
 
-		blurDownsampling = (SeekBar) findViewById(R.id.blur_downsampling);
-		blurDownsampling.setProgress(3);
-		blurDownsampling.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				updateDownsampling();
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-			}
-		});
-		blurDownsamplingText = (TextView) findViewById(R.id.blur_downsampling_val);
-		updateDownsampling();
+		findViewById(R.id.drag).setOnTouchListener(touchListener);
 	}
 
 	private void updateRadius() {
@@ -71,8 +54,20 @@ public class MainActivity extends Activity {
 		blurRadiusText.setText(blurRadius.getProgress() + "dp");
 	}
 
-	private void updateDownsampling() {
-		blurView.setDownsampleFactor(1 + blurDownsampling.getProgress());
-		blurDownsamplingText.setText(String.valueOf(1 + blurDownsampling.getProgress()));
-	}
+	private View.OnTouchListener touchListener = new View.OnTouchListener() {
+		float dx, dy;
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			View target = findViewById(R.id.blur_frame);
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+				dx = target.getX() - event.getRawX();
+				dy = target.getY() - event.getRawY();
+			} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+				target.setX(event.getRawX() + dx);
+				target.setY(event.getRawY() + dy);
+			}
+			return true;
+		}
+	};
 }
