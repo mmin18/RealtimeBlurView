@@ -70,4 +70,12 @@ public class MainActivity extends Activity {
 			return true;
 		}
 	};
+
+	private boolean slideUp;
+
+	public void doSlide(View v) {
+		final View view = findViewById(R.id.blur_frame);
+		view.animate().translationYBy((slideUp ? -1 : 1) * view.getHeight()).setDuration(1000).start();
+		slideUp = !slideUp;
+	}
 }

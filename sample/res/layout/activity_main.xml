@@ -48,17 +48,25 @@
 			android:textColor="#000"
 			android:textSize="13sp"/>
 
-		<TextView
+		<Button
 			android:id="@+id/drag"
 			android:layout_width="wrap_content"
-			android:layout_height="60dp"
+			android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
 			android:layout_alignParentTop="true"
-			android:layout_centerHorizontal="true"
-			android:background="#333"
+			android:layout_margin="20dp"
 			android:gravity="center"
-			android:padding="10dp"
 			android:text="DRAG HERE!"
-			android:textColor="#fff"
+			android:textSize="20sp"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true"
+			android:layout_margin="20dp"
+			android:onClick="doSlide"
+			android:text="Slide Anim"
 			android:textSize="20sp"/>
 	</RelativeLayout>
 
