@@ -128,8 +128,16 @@ public class RealtimeBlurView extends View {
 
 		if (mDirty || mRenderScript == null) {
 			if (mRenderScript == null) {
-				mRenderScript = RenderScript.create(getContext());
-				mBlurScript = ScriptIntrinsicBlur.create(mRenderScript, Element.U8_4(mRenderScript));
+				try {
+					mRenderScript = RenderScript.create(getContext());
+					mBlurScript = ScriptIntrinsicBlur.create(mRenderScript, Element.U8_4(mRenderScript));
+				} catch (android.support.v8.renderscript.RSRuntimeException e) {
+					if (e.getMessage() != null && e.getMessage().startsWith("Error loading RS jni library: java.lang.UnsatisfiedLinkError:")) {
+						throw new RuntimeException("Error loading RS jni library, Upgrade buildToolsVersion=\"23.0.3\" or higher may solve this issue");
+					} else {
+						throw e;
+					}
+				}
 			}
 
 			mDirty = false;
@@ -260,4 +268,12 @@ public class RealtimeBlurView extends View {
 	}
 
 	private static StopException STOP_EXCEPTION = new StopException();
+
+	static {
+		try {
+			RealtimeBlurView.class.getClassLoader().loadClass("android.support.v8.renderscript.RenderScript");
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException("RenderScript support not enabled. Add \"android { defaultConfig { renderscriptSupportModeEnabled true }}\" in your build.gradle");
+		}
+	}
 }
