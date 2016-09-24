@@ -36,6 +36,7 @@ public class RealtimeBlurView extends View {
 	private Allocation mBlurInput, mBlurOutput;
 	private boolean mIsRendering;
 	private final Rect mRectSrc = new Rect(), mRectDst = new Rect();
+	private static int RENDERING_COUNT;
 
 	public RealtimeBlurView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -192,16 +193,18 @@ public class RealtimeBlurView extends View {
 					mBitmapToBlur.eraseColor(Color.TRANSPARENT);
 				}
 
-				mIsRendering = true;
 				int rc = mBlurringCanvas.save();
+				mIsRendering = true;
+				RENDERING_COUNT++;
 				try {
 					mBlurringCanvas.scale(1.f * mBlurredBitmap.getWidth() / getWidth(), 1.f * mBlurredBitmap.getHeight() / getHeight());
 					mBlurringCanvas.translate(-x, -y);
 					decor.draw(mBlurringCanvas);
 				} catch (StopException e) {
 				} finally {
-					mBlurringCanvas.restoreToCount(rc);
 					mIsRendering = false;
+					RENDERING_COUNT--;
+					mBlurringCanvas.restoreToCount(rc);
 				}
 
 				blur();
@@ -227,7 +230,10 @@ public class RealtimeBlurView extends View {
 	@Override
 	public void draw(Canvas canvas) {
 		if (mIsRendering) {
+			// Quit here, don't draw views above me
 			throw STOP_EXCEPTION;
+		} else if (RENDERING_COUNT > 0) {
+			// Doesn't support blurview overlap on another blurview
 		} else {
 			super.draw(canvas);
 		}
