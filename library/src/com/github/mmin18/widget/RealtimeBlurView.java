@@ -20,7 +20,13 @@ import android.view.ViewTreeObserver;
 import com.github.mmin18.realtimeblurview.R;
 
 /**
- * Created by mmin18 on 9/21/16.
+ * A realtime blurring overlay (like iOS UIVisualEffectView). Just put it above
+ * the view you want to blur and it doesn't have to be in the same ViewGroup
+ * <ul>
+ * <li>realtimeBlurRadius (10dp)</li>
+ * <li>realtimeDownsampleFactor (4)</li>
+ * <li>realtimeOverlayColor (#aaffffff)</li>
+ * </ul>
  */
 public class RealtimeBlurView extends View {
 
