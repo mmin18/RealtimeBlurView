@@ -70,4 +70,17 @@
 			android:textSize="20sp"/>
 	</RelativeLayout>
 
+	<com.github.mmin18.realtimeblurview.sample.CustomShapeBlurView
+		android:layout_width="300dp"
+		android:layout_height="80dp"
+		android:layout_gravity="bottom|center_horizontal"/>
+
+	<TextView
+		android:layout_width="300dp"
+		android:layout_height="80dp"
+		android:layout_gravity="bottom|center_horizontal"
+		android:gravity="center"
+		android:text="Custom Shape"
+		android:textSize="20sp"/>
+
 </FrameLayout>

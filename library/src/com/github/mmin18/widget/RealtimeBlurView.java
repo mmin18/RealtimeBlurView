@@ -169,8 +169,6 @@ public class RealtimeBlurView extends View {
 			if (mBlurredBitmap == null) {
 				return false;
 			}
-			mRectSrc.right = scaledWidth;
-			mRectSrc.bottom = scaledHeight;
 
 			mBlurringCanvas = new Canvas(mBitmapToBlur);
 			mBlurInput = Allocation.createFromBitmap(mRenderScript, mBitmapToBlur,
@@ -256,12 +254,25 @@ public class RealtimeBlurView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		if (mBlurredBitmap != null) {
+		drawBlurredBitmap(canvas, mBlurredBitmap, mOverlayColor);
+	}
+
+	/**
+	 * Custom draw the blurred bitmap and color to define your own shape
+	 *
+	 * @param canvas
+	 * @param blurredBitmap
+	 * @param overlayColor
+	 */
+	protected void drawBlurredBitmap(Canvas canvas, Bitmap blurredBitmap, int overlayColor) {
+		if (blurredBitmap != null) {
+			mRectSrc.right = blurredBitmap.getWidth();
+			mRectSrc.bottom = blurredBitmap.getHeight();
 			mRectDst.right = getWidth();
 			mRectDst.bottom = getHeight();
-			canvas.drawBitmap(mBlurredBitmap, mRectSrc, mRectDst, null);
+			canvas.drawBitmap(blurredBitmap, mRectSrc, mRectDst, null);
 		}
-		canvas.drawColor(mOverlayColor);
+		canvas.drawColor(overlayColor);
 	}
 
 	private static class StopException extends RuntimeException {

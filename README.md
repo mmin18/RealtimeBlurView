@@ -30,7 +30,7 @@ Add dependencies in your `build.gradle`:
 	}
 	android {
 		buildToolsVersion '23.0.3'                 // Use 23.0.3 or higher
-		default config {
+		defaultConfig {
 			minSdkVersion 15
 			renderscriptTargetApi 19
 			renderscriptSupportModeEnabled true    // Enable RS support
