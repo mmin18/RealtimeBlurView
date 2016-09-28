@@ -2,6 +2,7 @@ package com.github.mmin18.widget;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -190,7 +191,24 @@ public class RealtimeBlurView extends View {
 		public boolean onPreDraw() {
 			final int[] locations = new int[2];
 			if (isShown() && prepare()) {
-				View decor = ((Activity) getContext()).getWindow().getDecorView();
+				Activity a = null;
+				Context ctx = getContext();
+				while (true) {
+					if (ctx instanceof Activity) {
+						a = (Activity) ctx;
+						break;
+					} else if (ctx instanceof ContextWrapper) {
+						ctx = ((ContextWrapper) ctx).getBaseContext();
+					} else {
+						break;
+					}
+				}
+				if (a == null) {
+					// Not in a activity
+					return true;
+				}
+
+				View decor = a.getWindow().getDecorView();
 				decor.getLocationInWindow(locations);
 				int x = -locations[0];
 				int y = -locations[1];
