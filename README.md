@@ -26,7 +26,7 @@ Add dependencies in your `build.gradle`:
 
 ```groovy
 	dependencies {
-	    compile 'com.github.mmin18:realtimeblurview:1.0.3'
+	    compile 'com.github.mmin18:realtimeblurview:1.0.4'
 	}
 	android {
 		buildToolsVersion '23.0.3'                 // Use 23.0.3 or higher
@@ -47,3 +47,9 @@ Everytime your window draw, it will render a blurred bitmap, so there is a perfo
 I've run the sample on some old phones like Samsung Galaxy S2, Samsung Galaxy S3, it runs at full FPS. Here is a performance chart while scrolling the list on Nexus 5.
 
 ![Nexus5](imgs/2.png)
+
+# Changelog
+
+### 1.0.4 (2016-9-28)
+
+Support custom shape (by override drawBlurredBitmap()), support view in ContextThemeWrapper.
