@@ -215,11 +215,11 @@ public class RealtimeBlurView extends View {
 				}
 
 				View decor = a.getWindow().getDecorView();
-				decor.getLocationInWindow(locations);
+				decor.getLocationOnScreen(locations);
 				int x = -locations[0];
 				int y = -locations[1];
 
-				getLocationInWindow(locations);
+				getLocationOnScreen(locations);
 				x += locations[0];
 				y += locations[1];
 

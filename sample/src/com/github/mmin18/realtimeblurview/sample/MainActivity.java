@@ -2,10 +2,16 @@ package com.github.mmin18.realtimeblurview.sample;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -47,6 +53,26 @@ public class MainActivity extends Activity {
 		updateRadius();
 
 		findViewById(R.id.drag).setOnTouchListener(touchListener);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add("Popup Window");
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		showPopup();
+		return true;
+	}
+
+	private void showPopup() {
+		LayoutInflater inflater = LayoutInflater.from(this);
+		View layout = inflater.inflate(R.layout.popup_layout, null);
+		DisplayMetrics dm = getResources().getDisplayMetrics();
+		PopupWindow pw = new PopupWindow(layout, dm.widthPixels / 2, dm.heightPixels / 2, true);
+		pw.showAtLocation(layout, Gravity.CENTER_HORIZONTAL | Gravity.TOP, 0, 0);
 	}
 
 	private void updateRadius() {
