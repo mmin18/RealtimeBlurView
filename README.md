@@ -29,7 +29,7 @@ Add dependencies in your `build.gradle`:
 	    compile 'com.github.mmin18:realtimeblurview:1.0.4'
 	}
 	android {
-		buildToolsVersion '23.0.3'                 // Use 23.0.3 or higher
+		buildToolsVersion '24.0.2'                 // Use 23.0.3 or higher
 		defaultConfig {
 			minSdkVersion 15
 			renderscriptTargetApi 19

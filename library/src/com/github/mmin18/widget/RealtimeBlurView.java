@@ -3,6 +3,7 @@ package com.github.mmin18.widget;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.pm.ApplicationInfo;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -133,10 +134,15 @@ public class RealtimeBlurView extends View {
 					mRenderScript = RenderScript.create(getContext());
 					mBlurScript = ScriptIntrinsicBlur.create(mRenderScript, Element.U8_4(mRenderScript));
 				} catch (android.support.v8.renderscript.RSRuntimeException e) {
-					if (e.getMessage() != null && e.getMessage().startsWith("Error loading RS jni library: java.lang.UnsatisfiedLinkError:")) {
-						throw new RuntimeException("Error loading RS jni library, Upgrade buildToolsVersion=\"23.0.3\" or higher may solve this issue");
+					if (isDebug(getContext())) {
+						if (e.getMessage() != null && e.getMessage().startsWith("Error loading RS jni library: java.lang.UnsatisfiedLinkError:")) {
+							throw new RuntimeException("Error loading RS jni library, Upgrade buildToolsVersion=\"24.0.2\" or higher may solve this issue");
+						} else {
+							throw e;
+						}
 					} else {
-						throw e;
+						// In release mode, just ignore
+						return false;
 					}
 				}
 			}
@@ -304,5 +310,15 @@ public class RealtimeBlurView extends View {
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("RenderScript support not enabled. Add \"android { defaultConfig { renderscriptSupportModeEnabled true }}\" in your build.gradle");
 		}
+	}
+
+	// android:debuggable="true" in AndroidManifest.xml (auto set by build tool)
+	static Boolean DEBUG = null;
+
+	static boolean isDebug(Context ctx) {
+		if (DEBUG == null && ctx != null) {
+			DEBUG = (ctx.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+		}
+		return DEBUG == Boolean.TRUE;
 	}
 }
