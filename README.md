@@ -26,7 +26,7 @@ Add dependencies in your `build.gradle`:
 
 ```groovy
 	dependencies {
-	    compile 'com.github.mmin18:realtimeblurview:1.0.4'
+	    compile 'com.github.mmin18:realtimeblurview:1.0.5'
 	}
 	android {
 		buildToolsVersion '24.0.2'                 // Use 23.0.3 or higher
@@ -49,6 +49,11 @@ I've run the sample on some old phones like Samsung Galaxy S2, Samsung Galaxy S3
 ![Nexus5](imgs/2.png)
 
 # Changelog
+
+### 1.0.5 (2016-11-5)
+
+Support Popup Window (Use it as dialog background)
+Ignore UnsatisfiedLinkError if APK is not debuggable.
 
 ### 1.0.4 (2016-9-28)
 
