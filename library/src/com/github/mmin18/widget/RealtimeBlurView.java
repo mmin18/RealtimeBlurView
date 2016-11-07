@@ -159,8 +159,8 @@ public class RealtimeBlurView extends View {
 		final int width = getWidth();
 		final int height = getHeight();
 
-		int scaledWidth = (int) (width / downsampleFactor);
-		int scaledHeight = (int) (height / downsampleFactor);
+		int scaledWidth = Math.max(1, (int) (width / downsampleFactor));
+		int scaledHeight = Math.max(1, (int) (height / downsampleFactor));
 
 		if (mBlurringCanvas == null || mBlurredBitmap == null
 				|| mBlurredBitmap.getWidth() != scaledWidth
