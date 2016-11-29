@@ -1,21 +1,23 @@
 package com.github.mmin18.realtimeblurview.sample;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.github.mmin18.widget.RealtimeBlurView;
+
+import java.util.Random;
 
 /**
  * Created by mmin18 on 3/5/16.
@@ -68,11 +70,21 @@ public class MainActivity extends Activity {
 	}
 
 	private void showPopup() {
-		LayoutInflater inflater = LayoutInflater.from(this);
-		View layout = inflater.inflate(R.layout.popup_layout, null);
-		DisplayMetrics dm = getResources().getDisplayMetrics();
-		PopupWindow pw = new PopupWindow(layout, dm.widthPixels / 2, dm.heightPixels / 2, true);
-		pw.showAtLocation(layout, Gravity.CENTER_HORIZONTAL | Gravity.TOP, 0, 0);
+		AlertDialog.Builder b = new AlertDialog.Builder(this);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			LayoutInflater inflater = LayoutInflater.from(this);
+			View layout = inflater.inflate(R.layout.popup_layout, null);
+			b.setView(layout);
+		} else {
+			b.setView(R.layout.popup_layout);
+		}
+		Dialog dlg = b.show();
+		dlg.findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((ListView) findViewById(R.id.list)).smoothScrollToPosition(new Random(System.currentTimeMillis()).nextInt(10));
+			}
+		});
 	}
 
 	private void updateRadius() {

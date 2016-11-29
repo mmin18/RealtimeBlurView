@@ -44,6 +44,12 @@ public class RealtimeBlurView extends View {
 	private Allocation mBlurInput, mBlurOutput;
 	private boolean mIsRendering;
 	private final Rect mRectSrc = new Rect(), mRectDst = new Rect();
+	// mDecorView should be the root view of the activity (even if you are on a different window like a dialog)
+	private View mDecorView;
+	// If the view is on different root view (usually means we are on a PopupWindow),
+	// we need to manually call invalidate() in onPreDraw(), otherwise we will not be able to see the changes
+	private boolean mDifferentRoot;
+	private ViewTreeObserver mObserver;
 	private static int RENDERING_COUNT;
 
 	public RealtimeBlurView(Context context, AttributeSet attrs) {
@@ -197,24 +203,10 @@ public class RealtimeBlurView extends View {
 		public boolean onPreDraw() {
 			final int[] locations = new int[2];
 			if (isShown() && prepare()) {
-				Activity a = null;
-				Context ctx = getContext();
-				while (true) {
-					if (ctx instanceof Activity) {
-						a = (Activity) ctx;
-						break;
-					} else if (ctx instanceof ContextWrapper) {
-						ctx = ((ContextWrapper) ctx).getBaseContext();
-					} else {
-						break;
-					}
-				}
-				if (a == null) {
-					// Not in a activity
+				View decor = mDecorView;
+				if (decor == null) {
 					return true;
 				}
-
-				View decor = a.getWindow().getDecorView();
 				decor.getLocationOnScreen(locations);
 				int x = -locations[0];
 				int y = -locations[1];
@@ -244,21 +236,47 @@ public class RealtimeBlurView extends View {
 				}
 
 				blur();
+
+				if (mDifferentRoot) {
+					invalidate();
+				}
 			}
 
 			return true;
 		}
 	};
 
+	protected View getActivityDecorView() {
+		Context ctx = getContext();
+		for (int i = 0; i < 4 && ctx != null && !(ctx instanceof Activity) && ctx instanceof ContextWrapper; i++) {
+			ctx = ((ContextWrapper) ctx).getBaseContext();
+		}
+		if (ctx instanceof Activity) {
+			return ((Activity) ctx).getWindow().getDecorView();
+		} else {
+			return null;
+		}
+	}
+
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
-		getViewTreeObserver().addOnPreDrawListener(preDrawListener);
+		mDecorView = getActivityDecorView();
+		if (mDecorView != null) {
+			mObserver = mDecorView.getViewTreeObserver();
+			mObserver.addOnPreDrawListener(preDrawListener);
+			mDifferentRoot = mDecorView.getRootView() != getRootView();
+			if (mDifferentRoot) {
+				mDecorView.postInvalidate();
+			}
+		} else {
+			mDifferentRoot = false;
+		}
 	}
 
 	@Override
 	protected void onDetachedFromWindow() {
-		getViewTreeObserver().removeOnPreDrawListener(preDrawListener);
+		mObserver.removeOnPreDrawListener(preDrawListener);
 		release();
 		super.onDetachedFromWindow();
 	}
