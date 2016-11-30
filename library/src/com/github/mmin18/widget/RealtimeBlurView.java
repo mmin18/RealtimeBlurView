@@ -49,7 +49,6 @@ public class RealtimeBlurView extends View {
 	// If the view is on different root view (usually means we are on a PopupWindow),
 	// we need to manually call invalidate() in onPreDraw(), otherwise we will not be able to see the changes
 	private boolean mDifferentRoot;
-	private ViewTreeObserver mObserver;
 	private static int RENDERING_COUNT;
 
 	public RealtimeBlurView(Context context, AttributeSet attrs) {
@@ -263,8 +262,7 @@ public class RealtimeBlurView extends View {
 		super.onAttachedToWindow();
 		mDecorView = getActivityDecorView();
 		if (mDecorView != null) {
-			mObserver = mDecorView.getViewTreeObserver();
-			mObserver.addOnPreDrawListener(preDrawListener);
+			mDecorView.getViewTreeObserver().addOnPreDrawListener(preDrawListener);
 			mDifferentRoot = mDecorView.getRootView() != getRootView();
 			if (mDifferentRoot) {
 				mDecorView.postInvalidate();
@@ -276,7 +274,9 @@ public class RealtimeBlurView extends View {
 
 	@Override
 	protected void onDetachedFromWindow() {
-		mObserver.removeOnPreDrawListener(preDrawListener);
+		if (mDecorView != null) {
+			mDecorView.getViewTreeObserver().removeOnPreDrawListener(preDrawListener);
+		}
 		release();
 		super.onDetachedFromWindow();
 	}
