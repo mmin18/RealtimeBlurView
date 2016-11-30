@@ -50,6 +50,10 @@ I've run the sample on some old phones like Samsung Galaxy S2, Samsung Galaxy S3
 
 # Changelog
 
+### 1.0.8 (2016-11-29)
+
+Fix view not refreshed issue on PopupWindow
+
 ### 1.0.6 (2016-11-7)
 
 Fix crash when view is very small (draw at least 1px)
