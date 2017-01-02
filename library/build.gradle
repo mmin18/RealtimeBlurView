@@ -63,7 +63,7 @@ publish {
     userOrg = 'mmin18'
     groupId = 'com.github.mmin18'
     artifactId = 'realtimeblurview'
-    publishVersion = '1.0.8'
+    publishVersion = '1.1.0'
     desc = 'A realtime blurring overlay for Android (like iOS UIVisualEffectView)'
     website = 'https://github.com/mmin18/RealtimeBlurView'
 }
