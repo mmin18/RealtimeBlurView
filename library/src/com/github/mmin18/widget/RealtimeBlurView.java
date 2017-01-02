@@ -7,9 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v8.renderscript.Allocation;
 import android.support.v8.renderscript.Element;
 import android.support.v8.renderscript.RenderScript;
@@ -214,11 +212,8 @@ public class RealtimeBlurView extends View {
 				x += locations[0];
 				y += locations[1];
 
-				if (decor.getBackground() instanceof ColorDrawable) {
-					mBitmapToBlur.eraseColor(((ColorDrawable) decor.getBackground()).getColor());
-				} else {
-					mBitmapToBlur.eraseColor(Color.TRANSPARENT);
-				}
+				// just erase transparent
+				mBitmapToBlur.eraseColor(mOverlayColor & 0xffffff);
 
 				int rc = mBlurringCanvas.save();
 				mIsRendering = true;
@@ -226,6 +221,9 @@ public class RealtimeBlurView extends View {
 				try {
 					mBlurringCanvas.scale(1.f * mBlurredBitmap.getWidth() / getWidth(), 1.f * mBlurredBitmap.getHeight() / getHeight());
 					mBlurringCanvas.translate(-x, -y);
+					if (decor.getBackground() != null) {
+						decor.getBackground().draw(mBlurringCanvas);
+					}
 					decor.draw(mBlurringCanvas);
 				} catch (StopException e) {
 				} finally {
