@@ -145,6 +145,7 @@ public class RealtimeBlurView extends View {
 						}
 					} else {
 						// In release mode, just ignore
+						releaseScript();
 						return false;
 					}
 				}
@@ -170,20 +171,33 @@ public class RealtimeBlurView extends View {
 				|| mBlurredBitmap.getHeight() != scaledHeight) {
 			releaseBitmap();
 
-			mBitmapToBlur = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
-			if (mBitmapToBlur == null) {
-				return false;
-			}
+			boolean r = false;
+			try {
+				mBitmapToBlur = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
+				if (mBitmapToBlur == null) {
+					return false;
+				}
+				mBlurringCanvas = new Canvas(mBitmapToBlur);
 
-			mBlurredBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
-			if (mBlurredBitmap == null) {
-				return false;
-			}
+				mBlurInput = Allocation.createFromBitmap(mRenderScript, mBitmapToBlur,
+						Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
+				mBlurOutput = Allocation.createTyped(mRenderScript, mBlurInput.getType());
 
-			mBlurringCanvas = new Canvas(mBitmapToBlur);
-			mBlurInput = Allocation.createFromBitmap(mRenderScript, mBitmapToBlur,
-					Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
-			mBlurOutput = Allocation.createTyped(mRenderScript, mBlurInput.getType());
+				mBlurredBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
+				if (mBlurredBitmap == null) {
+					return false;
+				}
+
+				r = true;
+			} catch (OutOfMemoryError e) {
+				// Bitmap.createBitmap() may cause OOM error
+				// Simply ignore and fallback
+			} finally {
+				if (!r) {
+					releaseBitmap();
+					return false;
+				}
+			}
 		}
 		return true;
 	}
