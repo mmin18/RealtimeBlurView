@@ -201,11 +201,11 @@ public class RealtimeBlurView extends View {
 		@Override
 		public boolean onPreDraw() {
 			final int[] locations = new int[2];
-			if (isShown() && prepare()) {
-				View decor = mDecorView;
-				if (decor == null) {
-					return true;
-				}
+			Bitmap oldBmp = mBlurredBitmap;
+			View decor = mDecorView;
+			if (decor != null && isShown() && prepare()) {
+				boolean redrawBitmap = mBlurredBitmap != oldBmp;
+				oldBmp = null;
 				decor.getLocationOnScreen(locations);
 				int x = -locations[0];
 				int y = -locations[1];
@@ -236,7 +236,7 @@ public class RealtimeBlurView extends View {
 
 				blur();
 
-				if (mDifferentRoot) {
+				if (redrawBitmap || mDifferentRoot) {
 					invalidate();
 				}
 			}
