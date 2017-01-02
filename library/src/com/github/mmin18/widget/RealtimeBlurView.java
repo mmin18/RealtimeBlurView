@@ -188,11 +188,11 @@ public class RealtimeBlurView extends View {
 		return true;
 	}
 
-	protected void blur() {
-		mBlurInput.copyFrom(mBitmapToBlur);
+	protected void blur(Bitmap bitmapToBlur, Bitmap blurredBitmap) {
+		mBlurInput.copyFrom(bitmapToBlur);
 		mBlurScript.setInput(mBlurInput);
 		mBlurScript.forEach(mBlurOutput);
-		mBlurOutput.copyTo(mBlurredBitmap);
+		mBlurOutput.copyTo(blurredBitmap);
 	}
 
 	private final ViewTreeObserver.OnPreDrawListener preDrawListener = new ViewTreeObserver.OnPreDrawListener() {
@@ -219,7 +219,7 @@ public class RealtimeBlurView extends View {
 				mIsRendering = true;
 				RENDERING_COUNT++;
 				try {
-					mBlurringCanvas.scale(1.f * mBlurredBitmap.getWidth() / getWidth(), 1.f * mBlurredBitmap.getHeight() / getHeight());
+					mBlurringCanvas.scale(1.f * mBitmapToBlur.getWidth() / getWidth(), 1.f * mBitmapToBlur.getHeight() / getHeight());
 					mBlurringCanvas.translate(-x, -y);
 					if (decor.getBackground() != null) {
 						decor.getBackground().draw(mBlurringCanvas);
@@ -232,7 +232,7 @@ public class RealtimeBlurView extends View {
 					mBlurringCanvas.restoreToCount(rc);
 				}
 
-				blur();
+				blur(mBitmapToBlur, mBlurredBitmap);
 
 				if (redrawBitmap || mDifferentRoot) {
 					invalidate();
