@@ -38,6 +38,12 @@ Add dependencies in your `build.gradle`:
 	}
 ```
 
+Add proguard rules if necessary:
+
+```
+-keep class android.support.v8.renderscript.** { *; }
+```
+
 # Performance
 
 RealtimeBlurView use RenderScript to blur the bitmap, just like [500px-android-blur](https://github.com/500px/500px-android-blur).
