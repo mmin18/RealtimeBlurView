@@ -20,7 +20,7 @@ Just put the view in the layout xml, no Java code is required.
 
 Try the sample apk: [blurring.apk](imgs/blurring.apk)
 
-## Adding to project
+# Adding to project
 
 Add dependencies in your `build.gradle`:
 
@@ -43,6 +43,10 @@ Add proguard rules if necessary:
 ```
 -keep class android.support.v8.renderscript.** { *; }
 ```
+
+# Limitations
+
+- It will not work with SurfaceView / TextureView like VideoView, GoogleMapView
 
 # Performance
 
