@@ -1,24 +1,26 @@
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:3.0.0'
     }
 }
 
 allprojects {
     repositories {
+        google()
         jcenter()
     }
 }
 
 ext {
-	compileSdkVersion = 23
-	buildToolsVersion = "24.0.2"
+	compileSdkVersion = 27
+	buildToolsVersion = "27.0.0"
 	minSdkVersion = 15
-	targetSdkVersion = 23
-	sourceCompatibility = JavaVersion.VERSION_1_7
-	targetCompatibility = JavaVersion.VERSION_1_7
+	targetSdkVersion = 27
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
 	lintAbortOnError = false
 }
