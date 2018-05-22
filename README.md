@@ -26,7 +26,7 @@ Add dependencies in your `build.gradle`:
 
 ```groovy
 	dependencies {
-	    compile 'com.github.mmin18:realtimeblurview:1.1.0'
+	    compile 'com.github.mmin18:realtimeblurview:1.1.1'
 	}
 	android {
 		buildToolsVersion '24.0.2'                 // Use 23.0.3 or higher
@@ -46,6 +46,8 @@ Add proguard rules if necessary:
 
 # Limitations
 
+- Adding multiple RealtimeBlurView (even not visible) may hurt drawing performance, like use it in ListView or RecyclerView.
+
 - It will not work with SurfaceView / TextureView like VideoView, GoogleMapView
 
 # Performance
@@ -59,6 +61,10 @@ I've run the sample on some old phones like Samsung Galaxy S2, Samsung Galaxy S3
 ![Nexus5](imgs/2.png)
 
 # Changelog
+
+### 1.1.1 (2018-05-22)
+
+Fix downsample factor issue when blur radius is very big.
 
 ### 1.1.0 (2017-01-02)
 
