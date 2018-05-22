@@ -14,7 +14,7 @@ public class MyListAdapter extends BaseAdapter {
 
 	View[] cells;
 
-	public MyListAdapter(Context ctx) {
+	public MyListAdapter(Context ctx, int layoutId) {
 		super();
 
 		int[] imgs = {
@@ -24,9 +24,9 @@ public class MyListAdapter extends BaseAdapter {
 		LayoutInflater inflater = LayoutInflater.from(ctx);
 		cells = new View[imgs.length];
 		for (int i = 0; i < imgs.length; i++) {
-			ImageView iv = ((ImageView) inflater.inflate(R.layout.list_item, null));
-			iv.setImageResource(imgs[i]);
-			cells[i] = iv;
+			View cell = inflater.inflate(layoutId, null);
+			((ImageView) cell.findViewById(android.R.id.icon)).setImageResource(imgs[i]);
+			cells[i] = cell;
 		}
 
 	}

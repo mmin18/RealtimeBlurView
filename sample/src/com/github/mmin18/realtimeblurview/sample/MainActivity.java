@@ -3,6 +3,7 @@ package com.github.mmin18.realtimeblurview.sample;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		blurView = (RealtimeBlurView) findViewById(R.id.blur_view);
-		((ListView) findViewById(R.id.list)).setAdapter(new MyListAdapter(this));
+		((ListView) findViewById(R.id.list)).setAdapter(new MyListAdapter(this, R.layout.list_item));
 
 		blurRadius = (SeekBar) findViewById(R.id.blur_radius);
 		blurRadius.setProgress(10);
@@ -59,13 +60,18 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add("Popup Window");
+		menu.add("Popup").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		menu.add("List").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		showPopup();
+		if ("Popup".equals(item.getTitle())) {
+			showPopup();
+		} else if ("List".equals(item.getTitle())) {
+			startActivity(new Intent(this, ListActivity.class));
+		}
 		return true;
 	}
 
