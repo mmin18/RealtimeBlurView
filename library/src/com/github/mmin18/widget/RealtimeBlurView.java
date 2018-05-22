@@ -130,6 +130,11 @@ public class RealtimeBlurView extends View {
 		}
 
 		float downsampleFactor = mDownsampleFactor;
+		float radius = mBlurRadius / downsampleFactor;
+		if (radius > 25) {
+			downsampleFactor = downsampleFactor * radius / 25;
+			radius = 25;
+		}
 
 		if (mDirty || mRenderScript == null) {
 			if (mRenderScript == null) {
@@ -151,13 +156,8 @@ public class RealtimeBlurView extends View {
 				}
 			}
 
-			mDirty = false;
-			float radius = mBlurRadius / downsampleFactor;
-			if (radius > 25) {
-				downsampleFactor = downsampleFactor * radius / 25;
-				radius = 25;
-			}
 			mBlurScript.setRadius(radius);
+			mDirty = false;
 		}
 
 		final int width = getWidth();
