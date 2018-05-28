@@ -26,7 +26,7 @@ Add dependencies in your `build.gradle`:
 
 ```groovy
 	dependencies {
-	    compile 'com.github.mmin18:realtimeblurview:1.1.1'
+	    compile 'com.github.mmin18:realtimeblurview:1.1.2'
 	}
 	android {
 		buildToolsVersion '24.0.2'                 // Use 23.0.3 or higher
@@ -61,6 +61,10 @@ I've run the sample on some old phones like Samsung Galaxy S2, Samsung Galaxy S3
 ![Nexus5](imgs/2.png)
 
 # Changelog
+
+### 1.1.2 (2018-05-28)
+
+Bug fix (Draw overlay color in rect).
 
 ### 1.1.1 (2018-05-22)
 
