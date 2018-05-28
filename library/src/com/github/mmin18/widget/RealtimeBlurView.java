@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.v8.renderscript.Allocation;
 import android.support.v8.renderscript.Element;
@@ -41,6 +42,7 @@ public class RealtimeBlurView extends View {
 	private ScriptIntrinsicBlur mBlurScript;
 	private Allocation mBlurInput, mBlurOutput;
 	private boolean mIsRendering;
+	private Paint mPaint;
 	private final Rect mRectSrc = new Rect(), mRectDst = new Rect();
 	// mDecorView should be the root view of the activity (even if you are on a different window like a dialog)
 	private View mDecorView;
@@ -58,6 +60,8 @@ public class RealtimeBlurView extends View {
 		mDownsampleFactor = a.getFloat(R.styleable.RealtimeBlurView_realtimeDownsampleFactor, 4);
 		mOverlayColor = a.getColor(R.styleable.RealtimeBlurView_realtimeOverlayColor, 0xAAFFFFFF);
 		a.recycle();
+
+		mPaint = new Paint();
 	}
 
 	public void setBlurRadius(float radius) {
@@ -326,7 +330,8 @@ public class RealtimeBlurView extends View {
 			mRectDst.bottom = getHeight();
 			canvas.drawBitmap(blurredBitmap, mRectSrc, mRectDst, null);
 		}
-		canvas.drawColor(overlayColor);
+		mPaint.setColor(overlayColor);
+		canvas.drawRect(mRectDst, mPaint);
 	}
 
 	private static class StopException extends RuntimeException {
