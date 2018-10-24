@@ -13,7 +13,6 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         renderscriptTargetApi 19
-        renderscriptSupportModeEnabled true
     }
 
     lintOptions {
@@ -23,6 +22,17 @@ android {
     compileOptions {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility
+    }
+
+    flavorDimensions "blurimpl"
+    productFlavors {
+        vanilla {
+            dimension "blurimpl"
+        }
+        supportlib {
+            dimension "blurimpl"
+            renderscriptSupportModeEnabled true
+        }
     }
 
     sourceSets {

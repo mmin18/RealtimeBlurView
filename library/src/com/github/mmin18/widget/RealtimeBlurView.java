@@ -299,11 +299,7 @@ public class RealtimeBlurView extends View {
 	private static StopException STOP_EXCEPTION = new StopException();
 
 	static {
-		try {
-			RealtimeBlurView.class.getClassLoader().loadClass("android.support.v8.renderscript.RenderScript");
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("RenderScript support not enabled. Add \"android { defaultConfig { renderscriptSupportModeEnabled true }}\" in your build.gradle");
-		}
+		BlurImpl.assertLibrarySupport();
 	}
 
 	// android:debuggable="true" in AndroidManifest.xml (auto set by build tool)
