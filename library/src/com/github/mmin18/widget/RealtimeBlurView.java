@@ -9,10 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.support.v8.renderscript.Allocation;
-import android.support.v8.renderscript.Element;
-import android.support.v8.renderscript.RenderScript;
-import android.support.v8.renderscript.ScriptIntrinsicBlur;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -38,9 +34,7 @@ public class RealtimeBlurView extends View {
 	private boolean mDirty;
 	private Bitmap mBitmapToBlur, mBlurredBitmap;
 	private Canvas mBlurringCanvas;
-	private RenderScript mRenderScript;
-	private ScriptIntrinsicBlur mBlurScript;
-	private Allocation mBlurInput, mBlurOutput;
+	private BlurImpl mBlurImpl;
 	private boolean mIsRendering;
 	private Paint mPaint;
 	private final Rect mRectSrc = new Rect(), mRectDst = new Rect();
@@ -93,14 +87,7 @@ public class RealtimeBlurView extends View {
 	}
 
 	private void releaseBitmap() {
-		if (mBlurInput != null) {
-			mBlurInput.destroy();
-			mBlurInput = null;
-		}
-		if (mBlurOutput != null) {
-			mBlurOutput.destroy();
-			mBlurOutput = null;
-		}
+		mBlurImpl.releaseBitmap();
 		if (mBitmapToBlur != null) {
 			mBitmapToBlur.recycle();
 			mBitmapToBlur = null;
@@ -112,14 +99,7 @@ public class RealtimeBlurView extends View {
 	}
 
 	private void releaseScript() {
-		if (mRenderScript != null) {
-			mRenderScript.destroy();
-			mRenderScript = null;
-		}
-		if (mBlurScript != null) {
-			mBlurScript.destroy();
-			mBlurScript = null;
-		}
+		mBlurImpl.releaseScript();
 	}
 
 	protected void release() {
@@ -140,27 +120,15 @@ public class RealtimeBlurView extends View {
 			radius = 25;
 		}
 
-		if (mDirty || mRenderScript == null) {
-			if (mRenderScript == null) {
-				try {
-					mRenderScript = RenderScript.create(getContext());
-					mBlurScript = ScriptIntrinsicBlur.create(mRenderScript, Element.U8_4(mRenderScript));
-				} catch (android.support.v8.renderscript.RSRuntimeException e) {
-					if (isDebug(getContext())) {
-						if (e.getMessage() != null && e.getMessage().startsWith("Error loading RS jni library: java.lang.UnsatisfiedLinkError:")) {
-							throw new RuntimeException("Error loading RS jni library, Upgrade buildToolsVersion=\"24.0.2\" or higher may solve this issue");
-						} else {
-							throw e;
-						}
-					} else {
-						// In release mode, just ignore
-						releaseScript();
-						return false;
-					}
+		if (mDirty || mBlurImpl == null) {
+			if (mBlurImpl == null) {
+				mBlurImpl = new BlurImpl();
+				if (!mBlurImpl.setupScript(getContext(), isDebug(getContext()))) {
+					return false;
 				}
 			}
 
-			mBlurScript.setRadius(radius);
+			mBlurImpl.setRadius(radius);
 			mDirty = false;
 		}
 
@@ -183,9 +151,7 @@ public class RealtimeBlurView extends View {
 				}
 				mBlurringCanvas = new Canvas(mBitmapToBlur);
 
-				mBlurInput = Allocation.createFromBitmap(mRenderScript, mBitmapToBlur,
-						Allocation.MipmapControl.MIPMAP_NONE, Allocation.USAGE_SCRIPT);
-				mBlurOutput = Allocation.createTyped(mRenderScript, mBlurInput.getType());
+				mBlurImpl.setupBitmap(mBitmapToBlur);
 
 				mBlurredBitmap = Bitmap.createBitmap(scaledWidth, scaledHeight, Bitmap.Config.ARGB_8888);
 				if (mBlurredBitmap == null) {
@@ -204,13 +170,6 @@ public class RealtimeBlurView extends View {
 			}
 		}
 		return true;
-	}
-
-	protected void blur(Bitmap bitmapToBlur, Bitmap blurredBitmap) {
-		mBlurInput.copyFrom(bitmapToBlur);
-		mBlurScript.setInput(mBlurInput);
-		mBlurScript.forEach(mBlurOutput);
-		mBlurOutput.copyTo(blurredBitmap);
 	}
 
 	private final ViewTreeObserver.OnPreDrawListener preDrawListener = new ViewTreeObserver.OnPreDrawListener() {
@@ -250,7 +209,7 @@ public class RealtimeBlurView extends View {
 					mBlurringCanvas.restoreToCount(rc);
 				}
 
-				blur(mBitmapToBlur, mBlurredBitmap);
+				mBlurImpl.blur(mBitmapToBlur, mBlurredBitmap);
 
 				if (redrawBitmap || mDifferentRoot) {
 					invalidate();
