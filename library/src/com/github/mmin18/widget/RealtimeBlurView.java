@@ -9,15 +9,17 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import androidx.renderscript.Allocation;
-import androidx.renderscript.Element;
-import androidx.renderscript.RenderScript;
-import androidx.renderscript.ScriptIntrinsicBlur;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RSRuntimeException;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicBlur;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
+import com.github.mmin18.realtimeblurview.BuildConfig;
 import com.github.mmin18.realtimeblurview.R;
 
 /**
@@ -145,8 +147,8 @@ public class RealtimeBlurView extends View {
 				try {
 					mRenderScript = RenderScript.create(getContext());
 					mBlurScript = ScriptIntrinsicBlur.create(mRenderScript, Element.U8_4(mRenderScript));
-				} catch (androidx.renderscript.RSRuntimeException e) {
-					if (isDebug(getContext())) {
+				} catch (RSRuntimeException e) {
+					if (BuildConfig.DEBUG) {
 						if (e.getMessage() != null && e.getMessage().startsWith("Error loading RS jni library: java.lang.UnsatisfiedLinkError:")) {
 							throw new RuntimeException("Error loading RS jni library, Upgrade buildToolsVersion=\"24.0.2\" or higher may solve this issue");
 						} else {
@@ -339,21 +341,5 @@ public class RealtimeBlurView extends View {
 
 	private static StopException STOP_EXCEPTION = new StopException();
 
-	static {
-		try {
-			RealtimeBlurView.class.getClassLoader().loadClass("androidx.renderscript.RenderScript");
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("RenderScript support not enabled. Add \"android { defaultConfig { renderscriptSupportModeEnabled true }}\" in your build.gradle");
-		}
-	}
 
-	// android:debuggable="true" in AndroidManifest.xml (auto set by build tool)
-	static Boolean DEBUG = null;
-
-	static boolean isDebug(Context ctx) {
-		if (DEBUG == null && ctx != null) {
-			DEBUG = (ctx.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-		}
-		return DEBUG == Boolean.TRUE;
-	}
 }
