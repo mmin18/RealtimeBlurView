@@ -33,10 +33,10 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		blurView = (RealtimeBlurView) findViewById(R.id.blur_view);
+		blurView = findViewById(R.id.blur_view);
 		((ListView) findViewById(R.id.list)).setAdapter(new MyListAdapter(this, R.layout.list_item));
 
-		blurRadius = (SeekBar) findViewById(R.id.blur_radius);
+		blurRadius = findViewById(R.id.blur_radius);
 		blurRadius.setProgress(10);
 		blurRadius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
 			public void onStopTrackingTouch(SeekBar seekBar) {
 			}
 		});
-		blurRadiusText = (TextView) findViewById(R.id.blur_radius_val);
+		blurRadiusText = findViewById(R.id.blur_radius_val);
 		updateRadius();
 
 		findViewById(R.id.drag).setOnTouchListener(touchListener);
@@ -85,12 +85,7 @@ public class MainActivity extends Activity {
 			b.setView(R.layout.popup_layout);
 		}
 		Dialog dlg = b.show();
-		dlg.findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				((ListView) findViewById(R.id.list)).smoothScrollToPosition(new Random(System.currentTimeMillis()).nextInt(10));
-			}
-		});
+		dlg.findViewById(R.id.btn).setOnClickListener(v -> ((ListView) findViewById(R.id.list)).smoothScrollToPosition(new Random(System.currentTimeMillis()).nextInt(10)));
 	}
 
 	private void updateRadius() {
