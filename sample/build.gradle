@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
 
 dependencies {
-    compile project(':library')
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':library')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -37,7 +36,7 @@ android {
         }
 
         // Move the tests to tests/java, tests/res, etc...
-        instrumentTest.setRoot('tests')
+        androidTest.setRoot('tests')
 
         // Move the build types to build-types/<type>
         // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
