@@ -11,7 +11,7 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        renderscriptTargetApi 19
+        renderscriptTargetApi 28
         renderscriptSupportModeEnabled true
     }
 
