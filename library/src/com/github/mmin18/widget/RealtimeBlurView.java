@@ -73,6 +73,10 @@ public class RealtimeBlurView extends View {
 		}
 	}
 
+	public float getBlurRadius(){
+		return mBlurRadius;
+	}
+
 	public void setDownSampleFactor(float factor) {
 		if (factor <= 0) {
 			throw new IllegalArgumentException("DownSample factor must be greater than 0.");
@@ -84,6 +88,10 @@ public class RealtimeBlurView extends View {
 			releaseBitmap();
 			invalidate();
 		}
+	}
+
+	public float getDownsampleFactor(){
+		return mDownsampleFactor;
 	}
 
 	public void setOverlayColor(int color) {
