@@ -3,7 +3,6 @@ package com.github.mmin18.widget;
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.pm.ApplicationInfo;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -27,7 +26,7 @@ import com.github.mmin18.realtimeblurview.R;
  * the view you want to blur and it doesn't have to be in the same ViewGroup
  * <ul>
  * <li>realtimeBlurRadius (10dp)</li>
- * <li>realtimeDownsampleFactor (4)</li>
+ * <li>realtimeDownSampleFactor (4)</li>
  * <li>realtimeOverlayColor (#aaffffff)</li>
  * </ul>
  */
@@ -59,7 +58,7 @@ public class RealtimeBlurView extends View {
 		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.RealtimeBlurView);
 		mBlurRadius = a.getDimension(R.styleable.RealtimeBlurView_realtimeBlurRadius,
 				TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, context.getResources().getDisplayMetrics()));
-		mDownsampleFactor = a.getFloat(R.styleable.RealtimeBlurView_realtimeDownsampleFactor, 4);
+		mDownsampleFactor = a.getFloat(R.styleable.RealtimeBlurView_realtimeDownSampleFactor, 4);
 		mOverlayColor = a.getColor(R.styleable.RealtimeBlurView_realtimeOverlayColor, 0xAAFFFFFF);
 		a.recycle();
 
@@ -74,9 +73,9 @@ public class RealtimeBlurView extends View {
 		}
 	}
 
-	public void setDownsampleFactor(float factor) {
+	public void setDownSampleFactor(float factor) {
 		if (factor <= 0) {
-			throw new IllegalArgumentException("Downsample factor must be greater than 0.");
+			throw new IllegalArgumentException("DownSample factor must be greater than 0.");
 		}
 
 		if (mDownsampleFactor != factor) {
