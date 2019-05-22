@@ -26,8 +26,17 @@ Add dependencies in your `build.gradle`:
 
 ```groovy
 	dependencies {
-	    compile 'com.github.mmin18:realtimeblurview:1.1.2'
+	    implementation 'com.github.mmin18:realtimeblurview:1.2'
 	}
+```
+
+## Support API level < 19
+
+The following step is only required if your minSdkVersion < 19, or you use renderscript support mode.
+
+Both AndroidX and Android Support Library is supported.
+
+```groovy
 	android {
 		buildToolsVersion '24.0.2'                 // Use 23.0.3 or higher
 		defaultConfig {
@@ -42,6 +51,7 @@ Add proguard rules if necessary:
 
 ```
 -keep class android.support.v8.renderscript.** { *; }
+-keep class androidx.renderscript.** { *; }
 ```
 
 # Limitations
@@ -61,6 +71,10 @@ I've run the sample on some old phones like Samsung Galaxy S2, Samsung Galaxy S3
 ![Nexus5](imgs/2.png)
 
 # Changelog
+
+### 1.2 (2019-05-22)
+
+Support both AndroidX and Android Support Library.
 
 ### 1.1.2 (2018-05-28)
 
