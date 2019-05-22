@@ -1,0 +1,27 @@
+#!/bin/bash
+
+cd $(dirname $0)
+BASEDIR=$(pwd)
+
+patch -N build.gradle < patch.diff
+
+cd $BASEDIR
+cp gradle.properties.none ../gradle.properties
+cp src-blurimpl/SupportLibraryBlurImpl.java src/com/github/mmin18/widget/
+../gradlew clean compileReleaseSources
+cd build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/
+rm -f libs/blurimpl.jar
+jar cf ../../../../../../libs/blurimpl.jar com/github/mmin18/widget/SupportLibraryBlurImpl.class
+cd $BASEDIR
+rm src/com/github/mmin18/widget/SupportLibraryBlurImpl.java
+
+cp gradle.properties.androidx ../gradle.properties
+cp src-blurimpl/AndroidXBlurImpl.java src/com/github/mmin18/widget/
+../gradlew clean compileReleaseSources
+cd build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/
+jar uf ../../../../../../libs/blurimpl.jar com/github/mmin18/widget/AndroidXBlurImpl.class
+cd $BASEDIR
+rm src/com/github/mmin18/widget/AndroidXBlurImpl.java
+
+cp gradle.properties.none ../gradle.properties
+patch -R build.gradle < patch.diff

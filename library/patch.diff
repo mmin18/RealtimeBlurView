@@ -1,0 +1,18 @@
+--- build.gradle	2019-05-22 18:41:39.000000000 +0800
++++ build.patch	2019-05-22 18:41:24.000000000 +0800
+@@ -13,6 +13,7 @@
+         minSdkVersion rootProject.ext.minSdkVersion
+         targetSdkVersion rootProject.ext.targetSdkVersion
+         renderscriptTargetApi 19
++        renderscriptSupportModeEnabled true
+     }
+ 
+     lintOptions {
+@@ -28,6 +29,7 @@
+         main {
+             manifest.srcFile 'AndroidManifest.xml'
+             java.srcDirs = ['src']
++            java.exclude('**/RealtimeBlurView.java')
+             resources.srcDirs = ['src']
+             aidl.srcDirs = ['src']
+             renderscript.srcDirs = ['src']
