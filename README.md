@@ -26,7 +26,7 @@ Add dependencies in your `build.gradle`:
 
 ```groovy
 	dependencies {
-	    implementation 'com.github.mmin18:realtimeblurview:1.2'
+	    implementation 'com.github.mmin18:realtimeblurview:1.2.1'
 	}
 ```
 
@@ -71,6 +71,10 @@ I've run the sample on some old phones like Samsung Galaxy S2, Samsung Galaxy S3
 ![Nexus5](imgs/2.png)
 
 # Changelog
+
+### 1.2.1 (2019-05-24)
+
+Improve BlurImpl detection.
 
 ### 1.2 (2019-05-22)
 
