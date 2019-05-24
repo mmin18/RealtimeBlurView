@@ -1,13 +1,16 @@
 package com.github.mmin18.widget;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 public class AndroidStockBlurImpl implements BlurImpl {
 	private RenderScript mRenderScript;
 	private ScriptIntrinsicBlur mBlurScript;

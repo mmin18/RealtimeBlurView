@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -62,27 +63,62 @@ public class RealtimeBlurView extends View {
 
 	protected BlurImpl getBlurImpl() {
 		if (BLUR_IMPL == 0) {
+			// try to use stock impl first
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+				try {
+					AndroidStockBlurImpl impl = new AndroidStockBlurImpl();
+					Bitmap bmp = Bitmap.createBitmap(4, 4, Bitmap.Config.ARGB_8888);
+					impl.prepare(getContext(), bmp, 4);
+					impl.release();
+					bmp.recycle();
+					BLUR_IMPL = 3;
+				} catch (Throwable e) {
+				}
+			}
+		}
+		if (BLUR_IMPL == 0) {
 			try {
 				getClass().getClassLoader().loadClass("androidx.renderscript.RenderScript");
+				// initialize RenderScript to load jni impl
+				// may throw unsatisfied link error
+				AndroidXBlurImpl impl = new AndroidXBlurImpl();
+				Bitmap bmp = Bitmap.createBitmap(4, 4, Bitmap.Config.ARGB_8888);
+				impl.prepare(getContext(), bmp, 4);
+				impl.release();
+				bmp.recycle();
 				BLUR_IMPL = 1;
-			} catch (ClassNotFoundException e) {
+			} catch (Throwable e) {
+				// class not found or unsatisfied link
 			}
 		}
 		if (BLUR_IMPL == 0) {
 			try {
 				getClass().getClassLoader().loadClass("android.support.v8.renderscript.RenderScript");
+				// initialize RenderScript to load jni impl
+				// may throw unsatisfied link error
+				SupportLibraryBlurImpl impl = new SupportLibraryBlurImpl();
+				Bitmap bmp = Bitmap.createBitmap(4, 4, Bitmap.Config.ARGB_8888);
+				impl.prepare(getContext(), bmp, 4);
+				impl.release();
+				bmp.recycle();
 				BLUR_IMPL = 2;
-			} catch (ClassNotFoundException e) {
+			} catch (Throwable e) {
+				// class not found or unsatisfied link
 			}
+		}
+		if (BLUR_IMPL == 0) {
+			// fallback to empty impl, which doesn't have blur effect
+			BLUR_IMPL = -1;
 		}
 		switch (BLUR_IMPL) {
 			case 1:
 				return new AndroidXBlurImpl();
 			case 2:
 				return new SupportLibraryBlurImpl();
-			default:
-				BLUR_IMPL = -1;
+			case 3:
 				return new AndroidStockBlurImpl();
+			default:
+				return new EmptyBlurImpl();
 		}
 	}
 
