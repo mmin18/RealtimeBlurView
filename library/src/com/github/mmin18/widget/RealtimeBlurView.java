@@ -7,6 +7,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -23,6 +24,7 @@ import com.github.mmin18.realtimeblurview.R;
  * <li>realtimeBlurRadius (10dp)</li>
  * <li>realtimeDownsampleFactor (4)</li>
  * <li>realtimeOverlayColor (#aaffffff)</li>
+ * <li>realtimeIsCircle (false)</li>
  * </ul>
  */
 public class RealtimeBlurView extends View {
@@ -30,6 +32,9 @@ public class RealtimeBlurView extends View {
 	private float mDownsampleFactor; // default 4
 	private int mOverlayColor; // default #aaffffff
 	private float mBlurRadius; // default 10dp (0 < r <= 25)
+	private boolean mIsCircle = false,  // default false
+			isCircleDrawn = false;
+
 
 	private final BlurImpl mBlurImpl;
 	private boolean mDirty;
@@ -56,6 +61,7 @@ public class RealtimeBlurView extends View {
 				TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10, context.getResources().getDisplayMetrics()));
 		mDownsampleFactor = a.getFloat(R.styleable.RealtimeBlurView_realtimeDownsampleFactor, 4);
 		mOverlayColor = a.getColor(R.styleable.RealtimeBlurView_realtimeOverlayColor, 0xAAFFFFFF);
+		mIsCircle = a.getBoolean(R.styleable.RealtimeBlurView_realtimeIsCircle, false);
 		a.recycle();
 
 		mPaint = new Paint();
@@ -270,7 +276,16 @@ public class RealtimeBlurView extends View {
 					mBlurringCanvas.restoreToCount(rc);
 				}
 
-				blur(mBitmapToBlur, mBlurredBitmap);
+				if(mIsCircle) {
+					if(!isCircleDrawn) {
+						isCircleDrawn = true;
+						mBitmapToBlur = getBitmapClippedCircle(mBitmapToBlur);
+
+						blur(mBitmapToBlur, mBlurredBitmap);
+					}
+				} else {
+					blur(mBitmapToBlur, mBlurredBitmap);
+				}
 
 				if (redrawBitmap || mDifferentRoot) {
 					invalidate();
@@ -351,11 +366,41 @@ public class RealtimeBlurView extends View {
 			canvas.drawBitmap(blurredBitmap, mRectSrc, mRectDst, null);
 		}
 		mPaint.setColor(overlayColor);
-		canvas.drawRect(mRectDst, mPaint);
+
+		if(mIsCircle) {
+			canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, getWidth() / 2f, mPaint);
+		} else {
+			canvas.drawRect(mRectDst, mPaint);
+		}
 	}
 
-	private static class StopException extends RuntimeException {
-	}
+    /**
+     * https://stackoverflow.com/a/15489830
+     *
+     * @param bitmap - the Bitmap that needs to be circle clipped
+     * @return - returns the new clipped Bitmap
+     */
+    public static Bitmap getBitmapClippedCircle(Bitmap bitmap) {
+
+        final int width = bitmap.getWidth();
+        final int height = bitmap.getHeight();
+        final Bitmap outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        final Path path = new Path();
+        path.addCircle(
+                (float)(width / 2)
+                , (float)(height / 2)
+                , (float) Math.min(width, (height / 2))
+                , Path.Direction.CCW);
+
+        final Canvas canvas = new Canvas(outputBitmap);
+        canvas.clipPath(path);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+        return outputBitmap;
+    }
+
+	private static class StopException extends RuntimeException { }
 
 	private static StopException STOP_EXCEPTION = new StopException();
+
 }
