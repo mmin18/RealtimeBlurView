@@ -26,7 +26,7 @@ Add dependencies in your `build.gradle`:
 
 ```groovy
 	dependencies {
-	    implementation 'com.github.mmin18:realtimeblurview:1.2.1'
+		implementation 'com.github.mmin18:RealtimeBlurView:master-SNAPSHOT'
 	}
 ```
 
